@@ -23,7 +23,7 @@
         </div>
         <div class="col col-shrink">
           <q-btn
-            @click="handleCommentClick"
+            @click="handleCreateContent"
             class="q-mb-lg"
             color="primary"
             label="โพสต์"
@@ -41,7 +41,11 @@
           enter-active-class="animated fadeIn slow"
           leave-active-class="animated fadeOut slow"
         >
-          <q-item v-for="qweet in qweets" :key="qweet.id" class="qweet q-py-md">
+          <q-item
+            v-for="qweet in qweets"
+            :key="qweet.userId"
+            class="qweet q-py-md"
+          >
             <q-item-section avatar top>
               <q-avatar size="xl">
                 <img
@@ -57,14 +61,16 @@
                   @accountName
                   <br class="lt-md" />&bull; {{ qweet.date }}
                 </span>
-                <span v-if="qweet.id == 1" class="text-blue-500"> Edit </span>
+                <span v-if="qweet.userId == 1" class="text-blue-500">
+                  Edit
+                </span>
               </q-item-label>
               <q-item-label class="qweet-content text-body1">{{
                 qweet.content
               }}</q-item-label>
               <div class="row justify-end q-mt-sm">
                 <q-btn
-                  v-if="qweet.id == 1"
+                  v-if="qweet.userId == 1"
                   flat
                   rounded
                   color="gray"
@@ -81,63 +87,62 @@
 </template>
 
 <script setup lang="ts">
-// import { fetchUsers } from 'src/boot/firebaseAPIService';
 import { ref, onMounted } from 'vue';
-// const msg = 'Hello!';
-import { collection, addDoc } from 'firebase/firestore';
-import { db } from 'boot/firebase';
-import {
-  createUser,
-  createUserRealtime,
-  readUserData,
-  setupRealtimeListener,
-} from 'src/boot/firebaseAPIService';
+import { createContent, readAllContent } from 'src/boot/firebaseAPIService';
+import { Content } from 'src/data/models/contentModel';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { db } from 'src/boot/firebase';
+
+const qweets = ref<Content[]>([]);
+const newQweetContent = ref('');
+
+const fetchContent = async () => {
+  qweets.value = await readAllContent();
+};
 
 onMounted(() => {
-  // createUserRealtime();
-  setupRealtimeListener();
-  const data = readUserData();
-  console.log(data);
-  // const data = fetchUsers();
-  // console.log(data);
+  setupContentListener();
+  fetchContent();
 });
-const newQweetContent = '';
-const qweets = [
-  {
-    id: 1,
-    content: "Be your own hero, it's cheaper than a movie ticket.",
-    date: 1611653238221,
-    liked: false,
-  },
-  {
-    id: 2,
-    content:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed feugiat justo id viverra consequat. Integer feugiat lorem faucibus est ornare scelerisque. Donec tempus, nunc vitae semper sagittis, odio magna semper ipsum, et laoreet sapien mauris vitae arcu.',
-    date: 1611653252444,
-    liked: true,
-  },
-  {
-    id: 1,
-    content: "Be your own hero, it's cheaper than a movie ticket.",
-    date: 1611653238221,
-    liked: false,
-  },
-  {
-    id: 1,
-    content: "Be your own hero, it's cheaper than a movie ticket.",
-    date: 1611653238221,
-    liked: false,
-  },
-  {
-    id: 1,
-    content: "Be your own hero, it's cheaper than a movie ticket.",
-    date: 1611653238221,
-    liked: false,
-  },
-];
+
+const setupContentListener = (): Content[] => {
+  try {
+    const contentArray: Content[] = [];
+    const contentCollection = collection(db, 'contents');
+    const contentSubscribe = onSnapshot(contentCollection, (snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        const doc = change.doc;
+        const contentData: Content = doc.data() as Content;
+        handleContentListener(contentData);
+      });
+    });
+
+    return contentArray;
+  } catch (error) {
+    return [];
+  }
+};
+
+const handleContentListener = async (newContent: Content) => {
+  try {
+    qweets.value.push(newContent);
+    qweets.value = qweets.value.slice().sort((a, b) => {
+      return b.date.toMillis() - a.date.toMillis();
+    });
+  } catch (error) {
+    console.error('Error handling content listener:', error);
+  }
+};
+
+const handleCreateContent = () => {
+  if (newQweetContent.value == '') return;
+  createContent(1, newQweetContent.value);
+  newQweetContent.value = '';
+};
 
 const handleCommentClick = () => {
-  createUserRealtime('Tanakan');
+  // createUserRealtime('Tanakan');
+  // createContent(1);
   // Handle comment click logic
   // fetchUsers();
 };
