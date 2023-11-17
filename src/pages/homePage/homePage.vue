@@ -14,9 +14,7 @@
           >
             <template v-slot:before>
               <q-avatar size="xl">
-                <img
-                  src="https://s.gravatar.com/avatar/ce7f3697e231df38b3ca6065848520da?s=80"
-                />
+                <img src="src\assets\blank-profile.png" />
               </q-avatar>
             </template>
           </q-input>
@@ -48,21 +46,16 @@
           >
             <q-item-section avatar top>
               <q-avatar size="xl">
-                <img
-                  src="https://s.gravatar.com/avatar/ce7f3697e231df38b3ca6065848520da?s=80"
-                />
+                <img src="src\assets\blank-profile.png" />
               </q-avatar>
             </q-item-section>
 
             <q-item-section>
               <q-item-label class="text-subtitle1">
-                <strong>Name of post</strong>
+                <strong>{{ userId }}</strong>
                 <span class="text-grey-7">
-                  @accountName
-                  <br class="lt-md" />&bull; {{ qweet.date }}
-                </span>
-                <span v-if="qweet.userId == 1" class="text-blue-500">
-                  Edit
+                  @{{ userId }} <br class="lt-md" />&bull;
+                  {{ qweet.date.toDate().toDateString() }}
                 </span>
               </q-item-label>
               <q-item-label class="qweet-content text-body1">{{
@@ -71,7 +64,7 @@
               <div class="row justify-end q-mt-sm">
                 <q-btn
                   @click="handleDeleteClick(qweet.documentId)"
-                  v-if="qweet.userId == 1"
+                  v-if="qweet.userId == userId"
                   flat
                   rounded
                   color="gray"
@@ -100,6 +93,7 @@ import { db } from 'src/boot/firebase';
 
 const qweets = ref<Content[]>([]);
 const newQweetContent = ref('');
+const userId = ref('');
 
 const fetchContent = async () => {
   qweets.value = await readAllContent();
@@ -108,7 +102,12 @@ const fetchContent = async () => {
 onMounted(() => {
   setupContentListener();
   fetchContent();
+  fetchUser();
 });
+
+const fetchUser = () => {
+  userId.value = localStorage.getItem('userId')!;
+};
 
 const setupContentListener = (): Content[] => {
   try {
@@ -145,8 +144,9 @@ const handleCreateContentListener = async (newContent: Content) => {
 };
 
 const handleCreateContent = () => {
-  if (newQweetContent.value == '') return;
-  createContent(1, newQweetContent.value);
+  if (newQweetContent.value == '' && userId.value != null) return;
+  createContent(Number(userId.value), newQweetContent.value);
+  console.log('userId: ' + userId.value);
   newQweetContent.value = '';
 };
 

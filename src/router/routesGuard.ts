@@ -8,6 +8,6 @@ export const authGuard: NavigationGuard = (to, from, next) => {
     next();
   } else {
     console.log('userId not found');
-    next({ name: RouteName.HOME });
+    next('/');
   }
 };
