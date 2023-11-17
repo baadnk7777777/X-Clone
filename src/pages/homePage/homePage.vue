@@ -106,7 +106,7 @@ onMounted(() => {
 });
 
 const fetchUser = () => {
-  userId.value = localStorage.getItem('userId')!;
+  userId.value = sessionStorage.getItem('userId')!;
 };
 
 const setupContentListener = (): Content[] => {
