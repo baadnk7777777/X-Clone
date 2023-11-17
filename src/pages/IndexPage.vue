@@ -70,6 +70,7 @@
               }}</q-item-label>
               <div class="row justify-end q-mt-sm">
                 <q-btn
+                  @click="handleDeleteClick(qweet.documentId)"
                   v-if="qweet.userId == 1"
                   flat
                   rounded
@@ -88,7 +89,11 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { createContent, readAllContent } from 'src/boot/firebaseAPIService';
+import {
+  createContent,
+  deleteContent,
+  readAllContent,
+} from 'src/boot/firebaseAPIService';
 import { Content } from 'src/data/models/contentModel';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from 'src/boot/firebase';
@@ -113,7 +118,12 @@ const setupContentListener = (): Content[] => {
       snapshot.docChanges().forEach((change) => {
         const doc = change.doc;
         const contentData: Content = doc.data() as Content;
-        handleContentListener(contentData);
+        contentData.documentId = doc.id;
+        if (change.type === 'added') {
+          handleCreateContentListener(contentData);
+        } else if (change.type === 'removed') {
+          fetchContent();
+        }
       });
     });
 
@@ -123,7 +133,7 @@ const setupContentListener = (): Content[] => {
   }
 };
 
-const handleContentListener = async (newContent: Content) => {
+const handleCreateContentListener = async (newContent: Content) => {
   try {
     qweets.value.push(newContent);
     qweets.value = qweets.value.slice().sort((a, b) => {
@@ -140,22 +150,8 @@ const handleCreateContent = () => {
   newQweetContent.value = '';
 };
 
-const handleCommentClick = () => {
-  // createUserRealtime('Tanakan');
-  // createContent(1);
-  // Handle comment click logic
-  // fetchUsers();
+const handleDeleteClick = async (documentId: string) => {
+  console.log('Deleting content: ' + documentId);
+  await deleteContent(documentId);
 };
-
-// const handleRetweetClick = () => {
-//   // Handle retweet click logic
-// };
-
-// const handleLikeClick = (qweet: any) => {
-//   // Handle like click logic
-// };
-
-// const handleDeleteClick = (qweet: any) => {
-//   // Handle delete click logic
-// };
 </script>

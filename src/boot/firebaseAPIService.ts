@@ -1,23 +1,17 @@
-import { database, db } from 'boot/firebase';
-import { get, query, ref, set } from 'firebase/database';
-// import { getDatabase, onValue, ref } from 'firebase/database';
-
+import { db } from 'boot/firebase';
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDocs,
-  onSnapshot,
 } from 'firebase/firestore';
 import { Content } from 'src/data/models/contentModel';
-import { onUnmounted } from 'vue';
 
 const createTimestamp = (): Date => {
   const timestamp = new Date();
   return timestamp;
 };
-
-// CRUD
 
 // CREATE Function.
 
@@ -48,6 +42,7 @@ export const readAllContent = async (): Promise<Content[]> => {
     console.log(querySnapshot);
     querySnapshot.forEach((doc) => {
       const contentData: Content = doc.data() as Content;
+      contentData.documentId = doc.id;
       contentArray.push(contentData);
     });
     const ascendingSortedContents = contentArray.slice().sort((a, b) => {
@@ -61,44 +56,16 @@ export const readAllContent = async (): Promise<Content[]> => {
   }
 };
 
-// UPDATE Function.
-
 // DELETE Function.
 
-const updateUserData = (snapshot: any) => {
-  if (snapshot.exists()) {
-    console.log('User data updated:', snapshot.val());
-  } else {
-    console.log('No user data found.');
-  }
-};
-export const createUserRealtime = async (name: string) => {
+export const deleteContent = async (contentId: string) => {
   try {
-    const usersRef = ref(database, 'users');
-    await set(usersRef, {
-      firstName: name,
-      lastName: 'Doe',
-      dob: '1990',
-    });
-    console.log('User data written successfully!');
-  } catch (error) {
-    console.error('Error creating user:', error);
-  }
-};
-export const readUserData = async () => {
-  try {
-    const usersRef = ref(database, 'users');
-    const snapshot = await get(usersRef);
-    if (snapshot.exists()) {
-      // console.log(snapshot.val());
-      const userData = snapshot.val();
-      console.log('User data retrieved successfully:', userData);
+    const colRef = collection(db, 'contents');
+    const docRef = doc(colRef, contentId);
 
-      return userData;
-    } else {
-      console.log('No user data found.');
-    }
+    await deleteDoc(docRef);
+    console.log('Document was deleted successfully.');
   } catch (error) {
-    console.error('Error reading user data:', error);
+    console.log('Failed to delete content. Error:', error);
   }
 };
