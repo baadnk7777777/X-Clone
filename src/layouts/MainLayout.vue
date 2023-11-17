@@ -35,6 +35,7 @@
             >หน้าแรก</q-item-section
           >
         </q-item>
+
         <q-item to="/about" v-ripple clickable exact>
           <q-item-section avatar>
             <q-icon name="person" size="sm" />
@@ -43,6 +44,16 @@
           <q-item-section class="text-base text-weight-bold"
             >ข้อมูลส่วนตัว</q-item-section
           >
+        </q-item>
+
+        <q-item @click="logout" v-if="userId" v-ripple clickable exact>
+          <q-item-section avatar>
+            <q-icon name="person" size="sm" />
+          </q-item-section>
+
+          <q-item-section class="text-base text-weight-bold">
+            Logout
+          </q-item-section>
         </q-item>
       </q-list>
     </q-drawer>
@@ -120,14 +131,28 @@
   </q-layout>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      left: false,
-      right: false,
-    };
-  },
+<script setup lang="ts">
+import { onMounted, ref } from 'vue';
+import { RouteName } from 'src/store/constants';
+import { useRouter } from 'vue-router';
+
+const left = ref(false);
+const right = ref(false);
+const router = useRouter();
+const userId = ref('');
+onMounted(() => {
+  fetchUser();
+});
+
+const fetchUser = () => {
+  userId.value = localStorage.getItem('userId')!;
+};
+
+const logout = () => {
+  localStorage.clear();
+  localStorage.removeItem('userId');
+  console.log(localStorage.getItem('userId'));
+  router.push('/');
 };
 </script>
 
