@@ -19,6 +19,6 @@ const userId = ref('');
 const login = () => {
   console.log(userId.value);
   sessionStorage.setItem('userId', userId.value);
-  router.push({ name: RouteName.HOME });
+  router.push('/home');
 };
 </script>
