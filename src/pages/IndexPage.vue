@@ -17,7 +17,7 @@ const router = useRouter();
 const userId = ref('');
 
 const login = () => {
-  localStorage.setItem('userId', userId.value);
+  sessionStorage.setItem('userId', userId.value);
   router.push({ name: RouteName.HOME });
 };
 </script>

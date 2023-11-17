@@ -145,13 +145,13 @@ onMounted(() => {
 });
 
 const fetchUser = () => {
-  userId.value = localStorage.getItem('userId')!;
+  userId.value = sessionStorage.getItem('userId')!;
 };
 
 const logout = () => {
-  localStorage.clear();
-  localStorage.removeItem('userId');
-  console.log(localStorage.getItem('userId'));
+  sessionStorage.clear();
+  sessionStorage.removeItem('userId');
+  console.log(sessionStorage.getItem('userId'));
   router.push('/');
 };
 </script>
