@@ -24,29 +24,29 @@
 // Create Variables for store input Field.
 // const newQweetContent
 
-const fetchContent = async () => {
-  // Create function for fetching content from firebaseAPIService.
-  // and keep to qweets variable.
-};
+// const fetchContent = async () => {
+// Create function for fetching content from firebaseAPIService.
+// and keep to qweets variable.
+// };
 
-onMounted(() => {
-  // setupContentListener();
-  // fetchContent();
-  // Define Listener function for realtime fetching content.
-  // Define function fetching content.
-});
+// onMounted(() => {
+// setupContentListener();
+// fetchContent();
+// Define Listener function for realtime fetching content.
+// Define function fetching content.
+// });
 
-const setupContentListener = (): Content[] => {};
+// const setupContentListener = (): Content[] => {};
 
-const handleCreateContentListener = async (newContent: Content) => {
-  // CreateFunctions for handling content.
-};
+// const handleCreateContentListener = async (newContent: Content) => {
+// CreateFunctions for handling content.
+// };
 
-const handleCreateContent = () => {
-  // CreateFunctions for handling create content.
-};
+// const handleCreateContent = () => {
+// CreateFunctions for handling create content.
+// };
 
-const handleDeleteClick = async (documentId: string) => {
-  // CreateFunctions for handling delete content.
-};
+// const handleDeleteClick = async (documentId: string) => {
+// CreateFunctions for handling delete content.
+// };
 </script>
